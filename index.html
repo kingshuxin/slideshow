@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+        * {
+        	padding: 0px;
+        	margin: 0px;
+        	list-style: none;
+        }
+        .wrapper {
+        	position: relative;
+        	margin: 100px auto; 
+        	width: 400px;
+        	height: 200px;
+        	overflow: hidden;
+        	border: 15px;
+        }
+        .wrappre ul {
+        	position: absolute;
+        	left: 0px;
+        	top: 0px;
+        	width: 200px;
+        	height: 200px;
+        }
+        .wrapper ul li {
+        	width: 400px;
+        	height: 200px;
+        	float: left; 
+        }
+        .wrapper ul li img {
+        	width: 100%;
+        	height: 100%;
+        }
+        .btn {
+        	width: 26px;
+        	height: 26px;
+        	background: #000;
+        	color: #f40;
+        	position: absolute;
+        	top: 50%;
+        	margin-top: -13px;
+        	text-align: center;
+        	line-height: 26px;
+        	opacity: 0.4;
+        	font-size: 20px;
+        	cursor: pointer;
+        }
+        .btn:hover{
+        	opacity: 0.8;
+        }
+        .btnLeft {
+        	left: 40px;        	
+        }
+        .btnRight {
+        	right: 40px;
+        }
+        .wrapper .sliderIndex{
+        	position: absolute;
+        	width: 100%;
+        	height: 20px;
+        	bottom: 10px;
+        	text-align: center;
+        }
+        .wrapper span{
+        	display: inline-block;
+        	width: 8px;
+        	height: 8px;
+        	border-radius:50%; 
+        	background: #ddd;
+        	margin-left: 10px;
+        	cursor: pointer;
+        }
+        .wrapper span.active{
+        	background: #f00;
+        }
+
+	</style>
+</head>
+<body>
+    <div class="wrapper">
+        <ul id="sliderPage">
+            <li><img src="1.jpg"></li>
+            <li><img src="2.jpg"></li>
+            <li><img src="3.jpg"></li>
+            <li><img src="4.jpg"></li>
+            <li><img src="1.jpg"></li>
+        </ul>
+     <div class="btn btnLeft" id="btnLeft">&lt;</div>
+     <div class="btn btnRight" id="btnRight">&gt;</div>
+     <div class="sliderIndex" id="sliderIndex">
+     <span class="active"></span>
+     <span></span>
+     <span></span>
+     <span></span>
+     </div>
+   </div>
+   <script type="move.js"></script>
+   <script>
+       var oSliderPage = document.getElementById("sliderPage"); 
+       var oSliderIndex = document.getElementById("sliderIndex")
+       var oSpanArray = document.getElementsByTagName("span");
+       var oBtnLeft = document.getElementById("btnLeft");
+       var oBtnRight = document.getElementById("btnRight");
+       //图片宽度即移动的距离
+       var movewidth = oSliderPage.children[0].offsetWidth;
+       //轮播的数量
+       var num = oSliderPage.children.length - 1;
+       var delayTimer = null;
+       var locked = true;
+       var index = 0;
+       oBtnLeft.onclick = function () {
+       	autoMove(-1);
+       }
+       oBtnRight.onclick = function () {
+       	autoMove(1);
+       }
+       for (var i = 0;i < oSpanArray.length; i) {
+       	oSpanArray[i].onclick = (function (clickIndex){
+            return function () {
+                clearTimeout(delayTimer);
+                index = clickIndex;
+                startMove(sliderPage,{left: -index * movewidth},function(){
+                	locked = true;
+                	delayTimer = setTimeout(autoMove,1500);
+                	 changeIndex (index);
+                })
+            }
+       	} (i))
+       }
+       //autoMove-让轮播图运动
+       //direction = 1||undefined->>默认轮播方向 从左向右轮播
+       //direction = -1             相反方向轮播 从又向左轮播
+       function autoMove (direction) {
+       	if (locked) {
+       		locked =false;
+       			clearTimeout(delayTimer);
+       	if (direction == undefined || direction == 1) {
+       		index++;
+       		startMove(oSliderPage,{left:oSliderPage.offsetLeft - movewidth},function(){
+              if (oSliderPage.offsetLeft === -num * movewidth) {
+              	oSliderPage.style.left = "0px";
+              	index = 0;
+              }
+               delayTimer = setTimeout(autoMove,1500);
+               locked = true;
+               changeIndex (index);
+       		})
+       	} else if (direction === -1) {
+       		if (oSliderPage.offsetLeft === 0) {
+       			oSliderPage.style.left = -num * movewidth + "px";
+       			index = num;
+       		}
+       		index--;
+       		startMove(oSliderPage,{left:oSliderPage.offsetLeft + movewidth},function(){
+	            delayTimer = setTimeout(autoMove,1500);
+	            locked = true;
+	            changeIndex (index);
+       		    })
+       	
+          	}
+        }       
+    }
+    function changeIndex (index) {
+        for (var i = 0;i < oSpanArray.length;i++){
+        	oSpanArray[i].className = "";
+        }
+        oSpanArray[index].className = "active";
+    }
+     delayTimer = setTimeout(autoMove,1500);         
+   </script>      
+</body>
+</html>
